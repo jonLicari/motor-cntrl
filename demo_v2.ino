@@ -7,20 +7,26 @@
  */
 
 // Variable declarations 
-const int slider = 11;
-const int radial = 12;
-const int joy = 13;
+const int slider = A1;
+const int radial = A2;
+const int joy = A0;
+
+// Motor PWM pin declaration
+const int m1 = 9;
+const int m2 = 10;
+const int m3 = 11;
 
 int slide_out = 0;
-int  rad_out = 0;
+int rad_out = 0;
 int joy_out = 0;
-int joy_map = 0;
+
+float op1, op2, op3;
 
 void setup() {
   // Set pins to analog output
-  pinMode(slider, OUTPUT);
-  pinMode(radial, OUTPUT);
-  pinMode(joy, OUTPUT);
+  pinMode(slider, INPUT);
+  pinMode(radial, INPUT);
+  pinMode(joy, INPUT);
 
   // Initialize Serial monitor
   Serial.begin(9600);
@@ -32,12 +38,7 @@ void loop() {
   slide_out = analogRead(slider);
   rad_out = analogRead(radial);
   joy_out = analogRead(joy);
-
-  // Map the values of the joystick from {0,5}[V] to {0,1023}[bits]
-  joy_map = map(joy_out, 0, 5, 0, 1023);
-
-  //Necessary to map slider and radial? 
-
+/*
   // Print the values to the serial monitor
   Serial.print("Slider voltage = ");
   Serial.print(slide_out);
@@ -46,8 +47,38 @@ void loop() {
   Serial.print(rad_out);
 
   Serial.print("\nJoystick x-axis position {0,1023} = ");
-  Serial.print(joy_map);
+  Serial.print(joy_out);
 
-  // Delay to allow A/D converter to complete computation
-  delay(5);
+  //Serial.print("\n\n-----------------");
+  */
+  // Map the 10-bit ADC digital signal to an 8-bit digital signal for the DAC
+  rad_out = map(rad_out, 0, 1023, 0, 255);
+  slide_out = map(slide_out, 0, 1023, 0, 255);
+  joy_out = map(joy_out, 0, 1023, 0, 255);
+  
+  // Send PWM output
+  analogWrite(m3, joy_out);
+  analogWrite(m2, rad_out);
+  analogWrite(m1, slide_out);
+
+  // Show operating speed as a percentage of the maximum speed
+  Serial.print("\nJoystick Motor operating speed = ");
+  op1 = (joy_out/255.0)*100.00;
+  Serial.print(op1);
+  Serial.print("%");
+
+  Serial.print("\nRadial Motor operating speed = ");
+  op2 = (rad_out/255.0)*100.00;
+  Serial.print(op2);
+  Serial.print("%");
+
+  Serial.print("\nSlider Motor operating speed = ");
+  op3 = (slide_out/255.0)*100.00;
+  Serial.print(op3);
+  Serial.print("%");
+  
+  Serial.print("\n\n-----------------");
+
+  // Delay to complete computation
+  delay(10);
 }
