@@ -6,15 +6,7 @@
  *  Modes are button activated and displayed on either LCD or 7 Seg
  */
 
-// Variable declarations 
-const int throttle = A1;
-const int pedal = A2;
-const int joy = A0;
-
-// Motor PWM pin declaration
-const int m1 = 9;
-const int m2 = 10;
-const int m3 = 11;
+#include "demo_v3.h"
 
 int throttle_out = 0;
 int pedal_out = 0;
@@ -22,17 +14,37 @@ int joy_out = 0;
 
 float op1, op2, op3;
 
+int sel, select; // Flight mode select variable
+
 void setup() {
+  
+  select = 0; // Initialize flight mode to 0 - Idle state
+  
   // Set pins to analog output
   pinMode(throttle, INPUT);
   pinMode(pedal, INPUT);
   pinMode(joy, INPUT);
+  pinMode(mode, INPUT);
 
   // Initialize Serial monitor
   Serial.begin(9600);
 }
 
 void loop() {
+
+  // Read in the state variable
+  sel = analogRead(mode);
+
+  // Determine the state based on the analog voltage
+  if (sel >= exp0*0.995 && sel =< exp0*1.005)
+    select = 0;
+  else if (sel >= exp1*0.995 && sel =< exp1*1.005)
+    select = 1;
+  else if (sel >= exp2*0.995 && sel =< exp2*1.005)
+    select = 2;
+  else if (sel >= exp3*0.995 && sel =< exp3*1.005)
+    select = 3;
+    
   // output_var = analogRead(pin_var);
   throttle_out = analogRead(throttle);
   pedal_out = analogRead(pedal);
