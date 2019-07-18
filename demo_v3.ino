@@ -38,19 +38,9 @@ void loop() {
   slide_out = analogRead(slider);
   rad_out = analogRead(radial);
   joy_out = analogRead(joy);
-/*
-  // Print the values to the serial monitor
-  Serial.print("Slider voltage = ");
-  Serial.print(slide_out);
+  
+  //rdVolt(); // Print the controls' analog voltage to the Serial monitor
 
-  Serial.print("\nRadial pot. voltage = ");
-  Serial.print(rad_out);
-
-  Serial.print("\nJoystick x-axis position {0,1023} = ");
-  Serial.print(joy_out);
-
-  //Serial.print("\n\n-----------------");
-  */
   // Map the 10-bit ADC digital signal to an 8-bit digital signal for the DAC
   rad_out = map(rad_out, 0, 1023, 0, 255);
   slide_out = map(slide_out, 0, 1023, 0, 255);
@@ -61,6 +51,40 @@ void loop() {
   analogWrite(m2, rad_out);
   analogWrite(m1, slide_out);
 
+  mtrSpeed(); // Prints the motor speed to the Serial Monitor
+  
+  // Delay to complete computation
+  delay(10);
+}
+
+void idle() {     //Essentially a do-nothing state
+}
+
+void flight() {   //PWM output
+}
+
+void pan() {   //pan code
+}
+
+void one() {   //PWM output from loop
+}
+
+void rdVolt() [   // Print the values to the serial monitor
+
+  Serial.print("Slider voltage = ");
+  Serial.print(slide_out);
+
+  Serial.print("\nRadial pot. voltage = ");
+  Serial.print(rad_out);
+
+  Serial.print("\nJoystick x-axis position {0,1023} = ");
+  Serial.print(joy_out);
+
+  Serial.print("\n\n-----------------");
+}
+
+void mtrSpeed() {   // Prints the motor speed to the serial monitor
+  
   // Show operating speed as a percentage of the maximum speed
   Serial.print("\nJoystick Motor operating speed = ");
   op1 = (joy_out/255.0)*100.00;
@@ -78,7 +102,4 @@ void loop() {
   Serial.print("%");
   
   Serial.print("\n\n-----------------");
-
-  // Delay to complete computation
-  delay(10);
 }
