@@ -33,23 +33,19 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   // output_var = analogRead(pin_var);
-  slide_out = analogRead(slider);
-  rad_out = analogRead(radial);
+  throttle_out = analogRead(throttle);
+  pedal_out = analogRead(pedal);
   joy_out = analogRead(joy);
   
   //rdVolt(); // Print the controls' analog voltage to the Serial monitor
 
   // Map the 10-bit ADC digital signal to an 8-bit digital signal for the DAC
-  rad_out = map(rad_out, 0, 1023, 0, 255);
-  slide_out = map(slide_out, 0, 1023, 0, 255);
+  pedal_out = map(pedal_out, 0, 1023, 0, 255);
+  throttle_out = map(throttle_out, 0, 1023, 0, 255);
   joy_out = map(joy_out, 0, 1023, 0, 255);
-  
-  // Send PWM output
-  analogWrite(m3, joy_out);
-  analogWrite(m2, rad_out);
-  analogWrite(m1, slide_out);
+
+  // Switch case for flight mode selection
 
   mtrSpeed(); // Prints the motor speed to the Serial Monitor
   
@@ -58,6 +54,8 @@ void loop() {
 }
 
 void idle() {     //Essentially a do-nothing state
+  
+  delay(5);
 }
 
 void flight() {   //PWM output
@@ -66,16 +64,20 @@ void flight() {   //PWM output
 void pan() {   //pan code
 }
 
-void one() {   //PWM output from loop
+void one() {   //1:1 control 
+  // Send PWM output
+  analogWrite(m3, joy_out); // Joystick manipulates motor3
+  analogWrite(m2, pedal_out); // 
+  analogWrite(m1, throttle_out);
 }
 
 void rdVolt() [   // Print the values to the serial monitor
 
-  Serial.print("Slider voltage = ");
-  Serial.print(slide_out);
+  Serial.print("Throttle voltage = ");
+  Serial.print(throttle_out);
 
-  Serial.print("\nRadial pot. voltage = ");
-  Serial.print(rad_out);
+  Serial.print("\nPedal pot. voltage = ");
+  Serial.print(pedal_out);
 
   Serial.print("\nJoystick x-axis position {0,1023} = ");
   Serial.print(joy_out);
@@ -91,13 +93,13 @@ void mtrSpeed() {   // Prints the motor speed to the serial monitor
   Serial.print(op1);
   Serial.print("%");
 
-  Serial.print("\nRadial Motor operating speed = ");
-  op2 = (rad_out/255.0)*100.00;
+  Serial.print("\npedal Motor operating speed = ");
+  op2 = (pedal_out/255.0)*100.00;
   Serial.print(op2);
   Serial.print("%");
 
-  Serial.print("\nSlider Motor operating speed = ");
-  op3 = (slide_out/255.0)*100.00;
+  Serial.print("\nthrottle Motor operating speed = ");
+  op3 = (throttle_out/255.0)*100.00;
   Serial.print(op3);
   Serial.print("%");
   
