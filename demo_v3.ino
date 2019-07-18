@@ -7,20 +7,26 @@
  */
 
 // Variable declarations 
-const int throttle = 11;
-const int pedal = 12;
-const int joy = 13;
+const int throttle = A1;
+const int pedal = A2;
+const int joy = A0;
+
+// Motor PWM pin declaration
+const int m1 = 9;
+const int m2 = 10;
+const int m3 = 11;
 
 int throttle_out = 0;
 int pedal_out = 0;
 int joy_out = 0;
-int joy_map = 0;
+
+float op1, op2, op3;
 
 void setup() {
   // Set pins to analog output
-  pinMode(throttle, OUTPUT);
-  pinMode(pedal, OUTPUT);
-  pinMode(joy, OUTPUT);
+  pinMode(throttle, INPUT);
+  pinMode(pedal, INPUT);
+  pinMode(joy, INPUT);
 
   // Initialize Serial monitor
   Serial.begin(9600);
