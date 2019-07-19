@@ -12,7 +12,7 @@ int throttle_out = 0;
 int pedal_out = 0;
 int joy_out = 0;
 
-float op1, op2, op3;
+float op1, op2, op3, ftr;
 
 int old, sel, select; // Flight mode select variable
 
@@ -36,7 +36,7 @@ void loop() {
   sel = analogRead(mode);
 
   // Only run state check if there has been a change in ANALOG voltage
-  if (sel != old) { // NOTE: This only works if the ANALOG signal is consistent and steady
+  if (sel != old && sel != 0) { // NOTE: This only works if the ANALOG signal is consistent and steady
     
     // Determine the state based on the analog voltage
     if (sel >= exp0*0.995 && sel =< exp0*1.005)
@@ -47,7 +47,9 @@ void loop() {
       select = 2;
     else if (sel >= exp3*0.995 && sel =< exp3*1.005)
       select = 3;
-  }
+
+    old = sel;
+  }   
     
   // output_var = analogRead(pin_var);
   throttle_out = analogRead(throttle);
@@ -86,9 +88,6 @@ void loop() {
 
   // Prints the motor speed to the Serial Monitor
   mtrSpeed(); 
-
-  // Store the current state 
-  old = sel; // NOTE: sel is ANALOG 
   
   // Delay to complete computation
   delay(5);
@@ -105,22 +104,28 @@ void idle() {                         //Essentially a do-nothing state
 
 void flight() {                       //PWM output
 
-  // Throttle input
-  analogWrite(m2, pedal_out);         // P controls T motor
+  /* Throttle input
+   *  PROBLEM: The throttle is supposed to modify current motor 
+   *  speeds without changing the motor speed ratio. This is not
+   *  possible as there's no way of reading current duty cycles.
+   *  SOL'N: Instead of having the throttle_out value set to a 
+   *  PWM pin it will be used to create a factor which will be
+   *  mutliplied to every analogWrite() statement.
+   */
+  ftr = map(throttle_out, 0, 255, 0.5, 1.5);
+  
+  // Pedal input
+  analogWrite(m2, pedal_out*ftr);         // P controls T motor
 
   // Joystick input
   if (joy_out < 128) {                // Left turn
-    analogWrite(m1, (128-joy_out));   // L motor decreases speed
-    analogWrite(m3, (256 - joy_out)); // R motor increases speed
+    analogWrite(m1, (128-joy_out)*ftr);   // L motor decreases speed
+    analogWrite(m3, (256 - joy_out)*ftr); // R motor increases speed
   }
   else {                              // Right turn
-    analogWrite(m1, joy_out);         // L motor increases speed
-    analogWrite(m3, (255 - joy_out)); // R motor decreases speed
-  }
-
-  // Pedal input
-  
-  
+    analogWrite(m1, joy_out*ftr);         // L motor increases speed
+    analogWrite(m3, (255 - joy_out)*ftr); // R motor decreases speed
+  }  
   
   delay(5);
 }
@@ -147,7 +152,7 @@ void one() {                          //1:1 control
   analogWrite(m1, throttle_out);      // Throttle manipulates 
 }
 
-void rdVolt() {   // Print the values to the serial monitor
+void rdVolt() {                       // Print the values to the serial monitor
 
   Serial.print("Throttle voltage = ");
   Serial.print(throttle_out);
@@ -161,8 +166,8 @@ void rdVolt() {   // Print the values to the serial monitor
   Serial.print("\n\n-----------------");
 }
 
-void mtrSpeed() {   // Prints the motor speed to the serial monitor
-  
+void mtrSpeed() {                     // Prints the motor speed to the serial monitor
+    
   // Show operating speed as a percentage of the maximum speed
   Serial.print("\nJoystick Motor operating speed = ");
   op1 = (joy_out/255.0)*100.00;
@@ -181,3 +186,4 @@ void mtrSpeed() {   // Prints the motor speed to the serial monitor
   
   Serial.print("\n\n-----------------");
 }
+
