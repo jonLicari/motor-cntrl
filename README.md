@@ -26,13 +26,6 @@ On startup,
 	
 Buttons will manipulate a Selector State implemented as switch case
 
-Case 1 //Flight
-
-	Full control input, all motors active
-	P - vert acc
-	Th - forward speed 	
-	J - L/R 
-
 Buttons being read as analog voltage, need to match voltages to int, set the state to int value
 
 solution:
@@ -48,11 +41,10 @@ For 100k [Ohm] pull down...
 	3 --- 10k	------ 0.9091 -- 931
 
 
-PAN
-
-	- J controls L and R motor, T motor holds previously set speed
-	- [Left] L drops speed, R increases speed
-	- [Right] R drops speed, L increases speeds
+IDLE
+	
+	- J, P, TH input is still recorded and can be printed to the Serial monitor
+	- No analogWrite() to PWM pin, thus, motors retain previously set speed
 
 FLIGHT
 
@@ -60,13 +52,26 @@ FLIGHT
 	- [Left] L motor drops speed, R increases speed
 	- [Right] R motor drops speed, L motor speeds up
 
-	- THROTTLE controls L, R, T motors and increases their speed by a factor //allows motors to keep speed ratios
-	- [Fast] factor > 1
-	- [Slow] factor < 1
+	- TH controls L, R, T motors and increases their speed by a factor //allows motors to keep speed ratios
+	- [FWD] factor > 1
+	- [BWD] factor < 1
 	
-	- PEDAL controls T motor and SETS PWM
-	- [Fwd] 0-max speed
+	- P controls T motor and SETS PWM
+	- [Vert. Acc.] 0-max speed
 
+PAN
+
+	- J controls L and R motor, T motor holds previously set speed
+	- [Left] L drops speed, R increases speed
+	- [Right] R drops speed, L increases speeds
+	
+1:1
+
+	- Each control manipulates Duty Cycle 0-1.00 for respective motor
+	- J controls L
+	- P controls T
+	- TH controls R
+	
 Issues
 	
-	- holding previously set value can be problematic; if the value was 0, scaling by a facto0r would have no effect
+	- Holding previously set value can be problematic; if the value was 0, scaling by a factor would not provide output
