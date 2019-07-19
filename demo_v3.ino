@@ -39,13 +39,13 @@ void loop() {
   if (sel != old && sel != 0) { // NOTE: This only works if the ANALOG signal is consistent and steady
     
     // Determine the state based on the analog voltage
-    if (sel >= exp0*0.995 && sel =< exp0*1.005)
+    if (sel >= exp0*0.995 && sel <= exp0*1.005)
       select = 0;
-    else if (sel >= exp1*0.995 && sel =< exp1*1.005)
+    else if (sel >= exp1*0.995 && sel <= exp1*1.005)
       select = 1;
-    else if (sel >= exp2*0.995 && sel =< exp2*1.005)
+    else if (sel >= exp2*0.995 && sel <= exp2*1.005)
       select = 2;
-    else if (sel >= exp3*0.995 && sel =< exp3*1.005)
+    else if (sel >= exp3*0.995 && sel <= exp3*1.005)
       select = 3;
 
     old = sel;
@@ -65,23 +65,23 @@ void loop() {
 
   // Switch case for flight mode selection
   switch (select) {
-     case 0
+     case 0:
       idle();
       break;
 
-     case 1
+     case 1:
       flight();
       break;
 
-     case 2
+     case 2:
       pan();
       break;
 
-     case 3
+     case 3:
       one();
       break;
 
-     default // In the event of mode select failure, vehicle maintains its position
+     default: // In the event of mode select failure, vehicle maintains its position
       idle();
       break;
   }
@@ -186,4 +186,3 @@ void mtrSpeed() {                     // Prints the motor speed to the serial mo
   
   Serial.print("\n\n-----------------");
 }
-
