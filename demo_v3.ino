@@ -14,7 +14,7 @@ int joy_out = 0;
 
 float op1, op2, op3;
 
-int sel, select; // Flight mode select variable
+int old, sel, select; // Flight mode select variable
 
 void setup() {
   
@@ -35,15 +35,19 @@ void loop() {
   // Read in the state variable
   sel = analogRead(mode);
 
-  // Determine the state based on the analog voltage
-  if (sel >= exp0*0.995 && sel =< exp0*1.005)
-    select = 0;
-  else if (sel >= exp1*0.995 && sel =< exp1*1.005)
-    select = 1;
-  else if (sel >= exp2*0.995 && sel =< exp2*1.005)
-    select = 2;
-  else if (sel >= exp3*0.995 && sel =< exp3*1.005)
-    select = 3;
+  // Only run state check if there has been a change in ANALOG voltage
+  if (sel != old) { // NOTE: This only works if the ANALOG signal is consistent and steady
+    
+    // Determine the state based on the analog voltage
+    if (sel >= exp0*0.995 && sel =< exp0*1.005)
+      select = 0;
+    else if (sel >= exp1*0.995 && sel =< exp1*1.005)
+      select = 1;
+    else if (sel >= exp2*0.995 && sel =< exp2*1.005)
+      select = 2;
+    else if (sel >= exp3*0.995 && sel =< exp3*1.005)
+      select = 3;
+  }
     
   // output_var = analogRead(pin_var);
   throttle_out = analogRead(throttle);
@@ -58,22 +62,60 @@ void loop() {
   joy_out = map(joy_out, 0, 1023, 0, 255);
 
   // Switch case for flight mode selection
+  switch (select) {
+     case 0
+      idle();
+      break;
 
-  mtrSpeed(); // Prints the motor speed to the Serial Monitor
+     case 1
+      flight();
+      break;
+
+     case 2
+      pan();
+      break;
+
+     case 3
+      one();
+      break;
+
+     default // In the event of mode select failure, vehicle maintains its position
+      idle();
+      break;
+  }
+
+  // Prints the motor speed to the Serial Monitor
+  mtrSpeed(); 
+
+  // Store the current state 
+  old = sel; // NOTE: sel is ANALOG 
   
   // Delay to complete computation
-  delay(10);
+  delay(5);
 }
 
 void idle() {     //Essentially a do-nothing state
-  
+  /* Do-nothing state
+   * Retains previously set values of motors
+   * Controls can still be manipulated and printed to Serial Monitor
+   * Control input does not affect the motor speed
+   */
   delay(5);
 }
 
 void flight() {   //PWM output
 }
 
-void pan() {   //pan code
+void pan() {   //Joystick only 
+  if (joy_out < 128) { // Left turn
+    analogWrite(); // L motor decreases speed
+    analogWrite(); // R motor increases speed
+  }
+  else { // Right turn
+    analogWrite(); // L motor increases speed
+    analogWrite(); // R motor decreases speed
+  }
+  delay(5);
 }
 
 void one() {   //1:1 control 
@@ -117,3 +159,4 @@ void mtrSpeed() {   // Prints the motor speed to the serial monitor
   
   Serial.print("\n\n-----------------");
 }
+
