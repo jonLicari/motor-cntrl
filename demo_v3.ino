@@ -8,14 +8,6 @@
 
 #include "demo_v3.h"
 
-int throttle_out = 0;
-int pedal_out = 0;
-int joy_out = 0;
-
-float op1, op2, op3, ftr;
-
-int old, sel, select; // Flight mode select variable
-
 void setup() {
   
   select = 0; // Initialize flight mode to 0 - Idle state
@@ -186,3 +178,4 @@ void mtrSpeed() {                     // Prints the motor speed to the serial mo
   
   Serial.print("\n\n-----------------");
 }
+
