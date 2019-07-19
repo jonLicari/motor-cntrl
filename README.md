@@ -74,4 +74,9 @@ PAN
 	
 Issues
 	
-	- Holding previously set value can be problematic; if the value was 0, scaling by a factor would not provide output
+	- Holding previously set value can be problematic; if value was 0, scaling by a factor would not provide o/p
+	- [flight()] Throttle is supposed to modify the current motor speeds without changing speed ratio between motors.
+		- A factor must be applied to an unknown value. No way of pulling current duty cycle
+		- Sol'n: Instead of having the throttle_out value directly written to a motor output it will be used to 
+		  create a multiplier which will be applied to every analogWrite() statement
+
