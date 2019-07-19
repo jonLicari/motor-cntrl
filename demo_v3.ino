@@ -94,7 +94,7 @@ void loop() {
   delay(5);
 }
 
-void idle() {     //Essentially a do-nothing state
+void idle() {                         //Essentially a do-nothing state
   /* Do-nothing state
    * Retains previously set values of motors
    * Controls can still be manipulated and printed to Serial Monitor
@@ -103,29 +103,51 @@ void idle() {     //Essentially a do-nothing state
   delay(5);
 }
 
-void flight() {   //PWM output
-}
+void flight() {                       //PWM output
 
-void pan() {   //Joystick only 
-  if (joy_out < 128) { // Left turn
-    analogWrite(); // L motor decreases speed
-    analogWrite(); // R motor increases speed
+  // Throttle input
+  analogWrite(m2, pedal_out);         // P controls T motor
+
+  // Joystick input
+  if (joy_out < 128) {                // Left turn
+    analogWrite(m1, (128-joy_out));   // L motor decreases speed
+    analogWrite(m3, (256 - joy_out)); // R motor increases speed
   }
-  else { // Right turn
-    analogWrite(); // L motor increases speed
-    analogWrite(); // R motor decreases speed
+  else {                              // Right turn
+    analogWrite(m1, joy_out);         // L motor increases speed
+    analogWrite(m3, (255 - joy_out)); // R motor decreases speed
   }
+
+  // Pedal input
+  
+  
+  
   delay(5);
 }
 
-void one() {   //1:1 control 
-  // Send PWM output
-  analogWrite(m3, joy_out); // Joystick manipulates motor3
-  analogWrite(m2, pedal_out); // 
-  analogWrite(m1, throttle_out);
+void pan() {                          //Joystick only 
+  
+  if (joy_out < 128) {                // Left turn
+    analogWrite(m1, (127 - joy_out)); // L motor decreases speed
+    analogWrite(m3, (255 - joy_out)); // R motor increases speed
+  }
+  else { // Right turn
+    analogWrite(m1, joy_out);         // L motor increases speed
+    analogWrite(m3, (255 - joy_out)); // R motor decreases speed
+  }
+  
+  delay(5);
 }
 
-void rdVolt() [   // Print the values to the serial monitor
+void one() {                          //1:1 control 
+  
+  // Send PWM output
+  analogWrite(m3, joy_out);           // Joystick manipulates motor3
+  analogWrite(m2, pedal_out);         // Pedal manipulates motor2
+  analogWrite(m1, throttle_out);      // Throttle manipulates 
+}
+
+void rdVolt() {   // Print the values to the serial monitor
 
   Serial.print("Throttle voltage = ");
   Serial.print(throttle_out);
@@ -159,4 +181,3 @@ void mtrSpeed() {   // Prints the motor speed to the serial monitor
   
   Serial.print("\n\n-----------------");
 }
-
