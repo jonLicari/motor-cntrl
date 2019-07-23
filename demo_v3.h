@@ -7,10 +7,10 @@
 #define demo_v3_h
 
   // Define the expected analog values for the Flight Mode Select button
-  #define exp0 1014
-  #define exp1 974
-  #define exp2 952
-  #define exp3 931
+  #define exp0 1014 // 1k
+  #define exp1 931 // 10k
+  #define exp2 840 // 22k
+  #define exp3 770 // 33k
 
   // Pin Assignments
   const int joy = A0; 
