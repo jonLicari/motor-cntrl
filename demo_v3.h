@@ -18,6 +18,12 @@
   const int pedal = A2;
   const int mode = A3;
 
+  // LED pins
+  const int s0 = 7;
+  const int s1 = 6;
+  const int s2 = 5;
+  const int s3 = 4;
+
   // Motor PWM pin declaration
   const int m1 = 9; // L motor
   const int m2 = 10; // T motor
