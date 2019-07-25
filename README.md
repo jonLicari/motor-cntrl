@@ -79,5 +79,12 @@ Issues
 		- A factor must be applied to an unknown value. No way of pulling current duty cycle
 		- Sol'n: Instead of having the throttle_out value directly written to a motor output it will be used to 
 		  create a multiplier which will be applied to every analogWrite() statement
-		- When applying factor, digital value may exceed 255. What is the effect on the output?
+		- flight mode actually works within two bounds:
+		1. Lower bound; when motor's speed is set such that the subtraction of the throttle factor results in
+		a negative sum, this will cause the motor speed to oscillate. 
+		
+		2. Upper bound; when the motor's speed is set such that the addition of the throttle factor results 
+		in a sum exceeding 255, this will cause the motors to stop.
 
+		- Sol'n: quick and dirty solution could be to set any value receding below 0, to 0 and any value 
+		exceeding 255, to 255. Want to explore better options.
