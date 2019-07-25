@@ -12,11 +12,17 @@ void setup() {
   
   select = 0; // Initialize flight mode to 0 - Idle state
   
-  // Set pins to analog output
+  // Set pins to analog input
   pinMode(throttle, INPUT);
   pinMode(pedal, INPUT);
   pinMode(joy, INPUT);
   pinMode(mode, INPUT);
+
+  // Set LED flight mode LEDs as output
+  pinMode(s0, OUTPUT);
+  pinMode(s1, OUTPUT);
+  pinMode(s2, OUTPUT);
+  pinMode(s3, OUTPUT);
 
   // Initialize Serial monitor
   Serial.begin(9600);
@@ -26,7 +32,7 @@ void loop() {
 
   // Read in the state variable
   sel = analogRead(mode);
-
+  
   // Only run state check if there has been a change in ANALOG voltage
   if (sel != old && sel != 0) { // NOTE: This only works if the ANALOG signal is consistent and steady
     
@@ -59,22 +65,47 @@ void loop() {
   switch (select) {
      case 0:
       idle();
+      //Serial.println("Enter Idle State");
+      digitalWrite(s0, HIGH);
+      digitalWrite(s1, LOW);
+      digitalWrite(s2, LOW);
+      digitalWrite(s3, LOW);
       break;
 
      case 1:
       flight();
+      //Serial.println("Enter Flight State");
+      digitalWrite(s0, LOW);
+      digitalWrite(s1, HIGH);
+      digitalWrite(s2, LOW);
+      digitalWrite(s3, LOW);
       break;
 
      case 2:
       pan();
+      //Serial.println("Enter Pan State");
+      digitalWrite(s0, LOW);
+      digitalWrite(s1, LOW);
+      digitalWrite(s2, HIGH);
+      digitalWrite(s3, LOW);
       break;
 
      case 3:
       one();
+      //Serial.println("Enter 1:1 State");
+      digitalWrite(s0, LOW);
+      digitalWrite(s1, LOW);
+      digitalWrite(s2, LOW);
+      digitalWrite(s3, HIGH);
       break;
 
      default: // In the event of mode select failure, vehicle maintains its position
       idle();
+      //Serial.println("Enter Default(Idle) State");
+      digitalWrite(s0, HIGH);
+      digitalWrite(s1, HIGH);
+      digitalWrite(s2, HIGH);
+      digitalWrite(s3, HIGH);
       break;
   }
 
@@ -82,7 +113,7 @@ void loop() {
   mtrSpeed(); 
   
   // Delay to complete computation
-  delay(5);
+  delay(10);
 }
 
 void idle() {                         //Essentially a do-nothing state
@@ -104,33 +135,48 @@ void flight() {                       //PWM output
    *  PWM pin it will be used to create a factor which will be
    *  mutliplied to every analogWrite() statement.
    */
-  ftr = map(throttle_out, 0, 255, 0.5, 1.5);
+
+  // Throttle input
+  if (throttle_out < 128) {                 // Slow Down
+    ftr = -1*(throttle_out/10);
+  }
+  else {                                    // Speed Up
+    ftr = throttle_out/10;
+  }
   
   // Pedal input
-  analogWrite(m2, pedal_out*ftr);         // P controls T motor
+  analogWrite(m2, pedal_out + ftr);         // P controls T motor
 
   // Joystick input
-  if (joy_out < 128) {                // Left turn
-    analogWrite(m1, (128-joy_out)*ftr);   // L motor decreases speed
-    analogWrite(m3, (256 - joy_out)*ftr); // R motor increases speed
+  if (joy_out < 120) {                      // Left turn
+    analogWrite(m1, (128-joy_out) + ftr);   // L motor decreases speed
+    analogWrite(m3, (256 - joy_out) + ftr); // R motor increases speed
   }
-  else {                              // Right turn
-    analogWrite(m1, joy_out*ftr);         // L motor increases speed
-    analogWrite(m3, (255 - joy_out)*ftr); // R motor decreases speed
-  }  
+  else if (joy_out > 136) {                 // Right turn
+    analogWrite(m1, joy_out + ftr);         // L motor increases speed
+    analogWrite(m3, (255 - joy_out) + ftr); // R motor decreases speed
+  }
+  else {                                    // Forward, rest position  
+    analogWrite(m1, pedal_out + ftr);       // Mimic m2 speed for fwd
+    analogWrite(m3, pedal_out + ftr);       // and vert. movement
+  }
   
-  delay(5);
+  delay(10);
 }
 
 void pan() {                          //Joystick only 
   
-  if (joy_out < 128) {                // Left turn
+  if (joy_out < 120) {                // Left turn
     analogWrite(m1, (127 - joy_out)); // L motor decreases speed
     analogWrite(m3, (255 - joy_out)); // R motor increases speed
   }
-  else { // Right turn
+  else if (joy_out > 136) {           // Right turn
     analogWrite(m1, joy_out);         // L motor increases speed
     analogWrite(m3, (255 - joy_out)); // R motor decreases speed
+  }
+  else {                              // Forward, rest position
+    analogWrite(m1, joy_out);
+    analogWrite(m3, joy_out);
   }
   
   delay(5);
@@ -178,4 +224,3 @@ void mtrSpeed() {                     // Prints the motor speed to the serial mo
   
   Serial.print("\n\n-----------------");
 }
-
