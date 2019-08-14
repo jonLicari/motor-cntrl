@@ -3,7 +3,7 @@
  *  demo_v4
  *  This code corresponds to the demo_v4 wiring diagram
  *  Contains 4 flight modes: Park, Pan, Flight, 1:1
- *  Modes are button activated and displayed on either LCD or 7 Seg
+ *  RF Transmission of PWM Output
  */
 
 #include <VirtualWire.h>
