@@ -88,3 +88,9 @@ Issues
 
 		- Sol'n: quick and dirty solution could be to set any value receding below 0, to 0 and any value 
 		exceeding 255, to 255. Want to explore better options.
+
+Current Version
+
+	- V.5 distributes the most recently updated code into the Transmitter and Receiver files respectively
+	- This configuration features two separate Uno MCUs (Tx controller, Rx receiver w/ motors)
+	- This update takes full advantage of wireless capabilities and is the final version of the project
